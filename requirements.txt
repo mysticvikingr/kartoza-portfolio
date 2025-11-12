@@ -1,0 +1,7 @@
+
+django==5.1.2
+psycopg2-binary==2.9.9
+django-leaflet==0.31.0
+gunicorn==22.0.0
+
+
