@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load leaflet_tags %}
+{% block title %}Users Map{% endblock %}
+{% block head %}{% leaflet_css %}{% endblock %}
+{% block content %}
+<style>
+	body, html, main.container { height: 100%; }
+	#map { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; }
+	.map-toolbar {
+		position: fixed; z-index: 1000; top: 1rem; left: 50%; transform: translateX(-50%);
+		background: var(--pico-background-color);
+		box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+		padding: .5rem 1rem; border-radius: .5rem;
+	}
+</style>
+<div id="map"></div>
+<div class="map-toolbar">
+	<a href="{% url 'profiles:home' %}">Home</a> ·
+	<a href="{% url 'profiles:my_profile' %}">My Profile</a>
+</div>
+{% endblock %}
+{% block scripts %}
+{% leaflet_js %}
+<script>
+	const map = L.map('map').setView([0, 0], 2);
+	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; OpenStreetMap contributors'
+	}).addTo(map);
+	fetch("{% url 'profiles:users_geojson' %}")
+		.then(r => r.json())
+		.then(geojson => {
+			const layer = L.geoJSON(geojson, {
+				pointToLayer: function (feature, latlng) {
+					return L.marker(latlng);
+				},
+				onEachFeature: function (feature, layer) {
+					const p = feature.properties || {};
+					const html = `
+						<strong>${p.username}</strong><br>
+						${p.home_address ? 'Address: ' + p.home_address + '<br>' : ''}
+						${p.phone_number ? 'Phone: ' + p.phone_number + '<br>' : ''}
+						${p.profile_url ? '<a href=\"' + p.profile_url + '\">My profile</a>' : ''}
+					`;
+					layer.bindPopup(html);
+				}
+			}).addTo(map);
+			if (layer.getLayers().length > 0) {
+				map.fitBounds(layer.getBounds().pad(0.2));
+			}
+		});
+</script>
+{% endblock %}
+
+

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load leaflet_tags %}
+{% block title %}Edit My Profile{% endblock %}
+{% block head %}{% leaflet_css %}{% endblock %}
+{% block content %}
+<h2>Edit My Profile</h2>
+<form method="post">
+	{% csrf_token %}
+	<fieldset>
+		<label>Home address
+			<input type="text" name="home_address" value="{{ form.instance.home_address }}">
+		</label>
+		<label>Phone number
+			<input type="text" name="phone_number" value="{{ form.instance.phone_number }}">
+		</label>
+	</fieldset>
+	<details>
+		<summary>Set location</summary>
+		<p>Click on the map to set your location, or enter coordinates:</p>
+		<div id="map" style="height: 400px;"></div>
+		<div class="grid">
+			<label>Latitude
+				<input type="number" step="any" name="latitude" id="latitude" value="{{ form.initial.latitude }}">
+			</label>
+			<label>Longitude
+				<input type="number" step="any" name="longitude" id="longitude" value="{{ form.initial.longitude }}">
+			</label>
+		</div>
+	</details>
+	<button type="submit">Save</button>
+	<a role="button" class="secondary" href="{% url 'profiles:my_profile' %}">Cancel</a>
+</form>
+{% endblock %}
+{% block scripts %}
+{% leaflet_js %}
+<script>
+	{% if form.initial.latitude and form.initial.longitude %}
+	const map = L.map('map').setView([{{ form.initial.latitude }}, {{ form.initial.longitude }}], 12);
+	{% else %}
+	const map = L.map('map').setView([0, 0], 2);
+	{% endif %}
+	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; OpenStreetMap contributors'
+	}).addTo(map);
+	let marker = null;
+	function setMarker(lat, lng) {
+		if (marker) { map.removeLayer(marker); }
+		marker = L.marker([lat, lng]).addTo(map);
+		document.getElementById('latitude').value = lat;
+		document.getElementById('longitude').value = lng;
+	}
+	{% if form.initial.latitude and form.initial.longitude %}
+	setMarker({{ form.initial.latitude }}, {{ form.initial.longitude }});
+	{% endif %}
+	map.on('click', function(e){
+		setMarker(e.latlng.lat, e.latlng.lng);
+	});
+</script>
+{% endblock %}
+
+

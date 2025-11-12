@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>{% block title %}Portfolio{% endblock %}</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+	{% block head %}{% endblock %}
+	<style>
+		.container { max-width: 960px; }
+	</style>
+</head>
+<body>
+<nav class="container">
+	<ul>
+		<li><strong><a href="{% url 'profiles:home' %}">Portfolio</a></strong></li>
+	</ul>
+	<ul>
+		<li><a href="{% url 'profiles:users_map' %}">Map</a></li>
+		{% if request.user.is_authenticated %}
+			<li><a href="{% url 'profiles:my_profile' %}">My Profile</a></li>
+			<li><a href="/admin/">Admin</a></li>
+		{% else %}
+			<li><a href="/admin/login/">Login</a></li>
+		{% endif %}
+	</ul>
+</nav>
+<main class="container">
+	{% for message in messages %}
+	<article class="contrast">
+		{{ message }}
+	</article>
+	{% endfor %}
+	{% block content %}{% endblock %}
+</main>
+{% block scripts %}{% endblock %}
+</body>
+</html>
+
+

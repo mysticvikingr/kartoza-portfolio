@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+{% block content %}
+<h2>My Profile</h2>
+<article>
+	<p><strong>Username:</strong> {{ request.user.username }}</p>
+	<p><strong>Email:</strong> {{ request.user.email }}</p>
+	<p><strong>Home address:</strong> {{ profile.home_address|default:"—" }}</p>
+	<p><strong>Phone number:</strong> {{ profile.phone_number|default:"—" }}</p>
+	<p><strong>Location set:</strong> {% if profile.location %}Yes{% else %}No{% endif %}</p>
+	<p><a role="button" href="{% url 'profiles:edit_my_profile' %}">Edit profile</a></p>
+	<p><a role="button" href="{% url 'profiles:users_map' %}">View users map</a></p>
+</article>
+{% endblock %}
+
+
