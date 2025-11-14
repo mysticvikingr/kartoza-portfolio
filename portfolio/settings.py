@@ -1,13 +1,17 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 from django.core.management.utils import get_random_secret_key
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", get_random_secret_key())
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY") or get_random_secret_key()
 
 DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
 
